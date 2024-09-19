@@ -1,0 +1,35 @@
+services:
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - grafana-data:/var/lib/grafana
+    env_file:
+      - ./grafana/.env
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql/etc/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/tmp/init
+    env_file:
+      - ./mysql/.env
+
+  cloudflare:
+    image: "cloudflare/cloudflared:latest"
+    container_name: "cloudflare-2"
+    volumes: ['./web/prod:/home/nonroot/.cloudflared']
+    command: tunnel run
+    restart: 
+      always
+
+volumes:
+  grafana-data:
+    external: true
